@@ -13,26 +13,27 @@ import java.sql.SQLException;
 public class BorrowerDAO implements BorrowerInterface {
     Connection connection = new DbConnection().conn();
     @Override
-    public Borrower create(Borrower borrower) {
+    public int create(Borrower borrower) {
         try {
             PreparedStatement statement = this.connection.prepareStatement("INSERT INTO Borrower (name,memberNum) values (?,?)");
             statement.setString(1,borrower.getName());
             statement.setInt(2, borrower.getMemberNum());
             statement.execute();
+            return this.getId(borrower);
         } catch (SQLException e) {
             System.out.println(e);
         }
-        return null;
+        return 0;
     }
-    public int getId(Borrower borrower)
-    {
+
+    @Override
+    public int getId(Borrower borrower) {
         try {
-            PreparedStatement statement = this.connection.prepareStatement("select * from borrower where name =? And memberNum = ?");
+            PreparedStatement statement = this.connection.prepareStatement("select * from borrower where name = ? And memberNum = ?");
             statement.setString(1,borrower.getName());
             statement.setInt(2,borrower.getMemberNum());
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                Borrower b = new Borrower();
+            while (resultSet.next()) {
                 return resultSet.getInt("id");
             }
         } catch (SQLException e) {

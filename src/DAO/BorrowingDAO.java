@@ -40,12 +40,11 @@ public class BorrowingDAO implements BorrowingInterface {
         }
         return false;
     }
-
     @Override
     public List<Borrowing> showBorrowedBooks() {
         List<Borrowing> borrowings = new ArrayList<>();
         try {
-            PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM Book JOIN Borrowing ON Book.ISBN = Borrowing.bookId JOIN Borrower ON Borrowing.borrowerId= Borrower.id where statut = 'disponible'" );
+            PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM Book JOIN Borrowing ON Book.ISBN = Borrowing.bookId JOIN Borrower ON Borrowing.borrowerId= Borrower.id where statut = 'indisponible' and borrowing.returnDate is null" );
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Borrowing b = new Borrowing();
@@ -61,5 +60,20 @@ public class BorrowingDAO implements BorrowingInterface {
             throw new RuntimeException(e);
         }
         return borrowings;
+    }
+    @Override
+    public boolean isBorrowed(int ISBN)
+    {
+        try {
+            PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM book where statut  = 'indisponible' and ISBN = ?" );
+            statement.setInt(1,ISBN);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

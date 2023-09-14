@@ -13,7 +13,7 @@ public class BookDAO implements BookInterface {
 
     Connection connection = new DbConnection().conn();
     @Override
-    public Book create(Book book)
+    public boolean create(Book book)
     {
         try {
             PreparedStatement statement = this.connection.prepareStatement("INSERT INTO Book (ISBN,title,author,statut) values (?,?,?,?)");
@@ -21,38 +21,46 @@ public class BookDAO implements BookInterface {
             statement.setString(2,book.getTitle());
             statement.setString(3,book.getAuthor());
             statement.setString(4, String.valueOf(Book.Status.disponible));
-            statement.execute();
+            if(statement.execute())
+            {
+                return true;
+            }
         } catch (SQLException e) {
             System.out.println(e);
         }
-        return null;
+        return false;
     }
     @Override
-    public Book delete(Book book)
+    public boolean delete(Book book)
     {
         try {
             PreparedStatement statement = this.connection.prepareStatement("DELETE FROM Book WHERE ISBN = "+book.getISBN());
-            statement.execute();
+            if(statement.execute())
+            {
+                return true;
+            }
         } catch (SQLException e) {
             System.out.println(e);
         }
-        return  null;
+        return false;
     }
     @Override
-    public Book update(Book book) {
+    public boolean update(Book book) {
         try {
             PreparedStatement statement = this.connection.prepareStatement(" UPDATE book SET title = ? , author = ? , statut =? WHERE ISBN = ?");
             statement.setString(1,book.getTitle());
             statement.setString(2,book.getAuthor());
             statement.setString(3, String.valueOf(Book.Status.disponible));
             statement.setInt(4,book.getISBN());
-            statement.execute();
+            if(statement.execute())
+            {
+                return true;
+            }
         }catch (SQLException e)
         {
             System.out.println(e);
         }
-
-        return null ;
+        return false;
     }
 
     @Override
@@ -74,6 +82,22 @@ public class BookDAO implements BookInterface {
             System.out.println(e);
         }
         return b;
+    }
+
+    @Override
+    public boolean lostBook(int ISBN) {
+        try {
+            PreparedStatement statement = this.connection.prepareStatement(" UPDATE book SET statut =? WHERE ISBN = ?");
+            statement.setString(1, String.valueOf(Book.Status.perdu));
+            statement.setInt(2,ISBN);
+            if (statement.execute()){
+                return true;
+            }
+        }catch (SQLException e)
+        {
+            System.out.println(e);
+        }
+        return false;
     }
 
     @Override
@@ -126,8 +150,8 @@ public class BookDAO implements BookInterface {
     {
         List<Book> books = new ArrayList<>();
         try {
-            PreparedStatement statement = this.connection.prepareStatement("select * from book where title =?" );
-            statement.setString(1,title);
+            PreparedStatement statement = this.connection.prepareStatement("select * from book where title Like ?" );
+            statement.setString(1,"%"+title+"%");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Book b = new Book();

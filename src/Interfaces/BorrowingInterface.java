@@ -10,4 +10,5 @@ public interface BorrowingInterface {
     Borrower create(Borrowing borrowing);
     boolean returnBook(int ISBN, Date returnDate);
     List<Borrowing> showBorrowedBooks();
+    boolean isBorrowed(int ISBN);
 }

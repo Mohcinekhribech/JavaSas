@@ -4,10 +4,11 @@ import DTO.Book;
 import java.util.List;
 
 public interface BookInterface {
-    Book create(Book book);
-    Book delete(Book book);
-    Book update(Book book);
+    boolean create(Book book);
+    boolean delete(Book book);
+    boolean update(Book book);
     Book getOne(int ISBN);
+    boolean lostBook(int ISBN);
     int countLostBooks();
     int countAvailableBooks();
     int countInvailableBooks();

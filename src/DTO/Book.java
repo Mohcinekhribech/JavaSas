@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Book {
     private String title ;
-    private int ISBN;
+    int ISBN;
     private String author;
     List<Borrowing> borrowings = new ArrayList<>();
     public static enum Status {
